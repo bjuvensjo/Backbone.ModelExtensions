@@ -12,7 +12,6 @@ Given a deep/nested object, it creates corresponding Backbone models and collect
 For instance, it can be useful when you're using model-view-binding.
 
 ```js
-
     // An object
     var myObject = {
         name: 'Name',
@@ -34,7 +33,7 @@ For instance, it can be useful when you're using model-view-binding.
         ]
     };
 
-    // Optionally specifies models and collections to use
+    // Optionally, specify models and collections to use
     var myObjectScheme = {
         model: Backbone.Model.extend({}),
         addresses: {
@@ -53,7 +52,7 @@ For instance, it can be useful when you're using model-view-binding.
     });
 
     myBackboneModelObject.on('all', function (eventName) {
-        ...
+        console.dir(arguments);
     });
 
     myBackboneModelObject.get('addresses').at(0).set('street', 'new street');

@@ -6,6 +6,7 @@ eval(require('fs').readFileSync('./Backbone.ModelExtensions.js', 'utf8'));
 // Test
 (function () {
     
+    // An object
     var myObject = {
         name: 'Name',
         addresses: [
@@ -26,6 +27,7 @@ eval(require('fs').readFileSync('./Backbone.ModelExtensions.js', 'utf8'));
         ]
     };
 
+    // Optionally, specify models and collections to use
     var myObjectScheme = {
         model: Backbone.Model.extend({}),
         addresses: {
@@ -34,10 +36,13 @@ eval(require('fs').readFileSync('./Backbone.ModelExtensions.js', 'utf8'));
         }
     };
 
+    // Specifies if events should "bubble" from child models and collections
+    var bubbleEvents = true;    
+
     var myBackboneModelObject = Backbone.ModelExtensions.toBackboneModel({
         object: myObject,
         scheme: myObjectScheme,
-        bubbleEvents: true
+        bubbleEvents: bubbleEvents
     });
 
     myBackboneModelObject.on('all', function (eventName) {

@@ -1,19 +1,11 @@
-Backbone.ModelExtensions
-========================
+var _ = require('underscore');
+var Backbone = require('backbone');
 
-Adds extensions into Backbone's base classes
+eval(require('fs').readFileSync('./Backbone.ModelExtensions.js', 'utf8'));
 
-# Installation
-Just copy [Backbone.ModelExtensions](https://github.com/bjuvensjo/Backbone.ModelExtensions/blob/master/Backbone.ModelExtensions.js)
-
-# Usage
-### Backbone.ModelExtensions.toBackboneModel
-Given a deep/nested object, it creates corresponding Backbone models and collections.
-For instance, it can be useful when you're using model-view-binding.
-
-```js
-
-    // An object
+// Test
+(function () {
+    
     var myObject = {
         name: 'Name',
         addresses: [
@@ -34,7 +26,6 @@ For instance, it can be useful when you're using model-view-binding.
         ]
     };
 
-    // Optionally specifies models and collections to use
     var myObjectScheme = {
         model: Backbone.Model.extend({}),
         addresses: {
@@ -43,20 +34,18 @@ For instance, it can be useful when you're using model-view-binding.
         }
     };
 
-    // Specifies if events should "bubble" from child models and collections
-    var bubbleEvents = true;    
-
     var myBackboneModelObject = Backbone.ModelExtensions.toBackboneModel({
         object: myObject,
         scheme: myObjectScheme,
-        bubbleEvents: bubbleEvents
+        bubbleEvents: true
     });
 
     myBackboneModelObject.on('all', function (eventName) {
-        ...
+        console.dir(arguments);
     });
 
     myBackboneModelObject.get('addresses').at(0).set('street', 'new street');
 
     console.log(JSON.stringify(myBackboneModelObject));
-```
+
+}());

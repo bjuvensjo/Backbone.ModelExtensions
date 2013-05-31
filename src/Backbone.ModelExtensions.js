@@ -1,3 +1,8 @@
+if (typeof module !== 'undefined' && module.exports) {
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+}
+
 'use strict';
 
 /**
@@ -62,6 +67,9 @@
             if (scheme.model) {
                 return new scheme.model();
             }
+            if (scheme.collection) {
+                return new scheme.collection();
+            }
             return new Backbone.Model();
         };
 
@@ -86,7 +94,7 @@
 
             if (options.scheme && options.scheme[key]) {
                 scheme = options.scheme[key];
-            };
+            }
 
             if (_.isArray(value)) {
                 child = createCollection(scheme);

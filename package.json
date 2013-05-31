@@ -1,0 +1,26 @@
+{
+  "name": "Backbone.ModelExtensions",
+  "version": "0.1.0",
+  "description": "Adds extensions into Backbone's base classes",
+  "main": "Backbone.ModelExtensions.js",
+  "scripts": {
+    "test": "buster test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bjuvensjo/Backbone.ModelExtensions.git"
+  },
+  "keywords": [
+    "backbone",
+    "model"
+  ],
+  "author": "bjuvensjo, baelter",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "gitHead": "1fe4d794d27419ce8245cd41426e22a3586a080c",
+  "devDependencies": {
+    "backbone": "~1.0.0",
+    "underscore": "~1.4.4",
+    "buster": "~0.6.12"
+  }
+}

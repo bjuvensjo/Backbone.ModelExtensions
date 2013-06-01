@@ -67,9 +67,6 @@ if (typeof module !== 'undefined' && module.exports) {
             if (scheme.model) {
                 return new scheme.model();
             }
-            if (scheme.collection) {
-                return new scheme.collection();
-            }
             return new Backbone.Model();
         };
 

@@ -49,12 +49,16 @@ buster.testCase("Backbone.ModelExtensions", {
 
     "should create custom collection": function () {
         'use strict';
-        var object = [];
+        var object = {
+            myCollection : []
+        };
 
         var MyCollection = Backbone.Collection.extend({});
 
         var scheme = {
-            collection : MyCollection
+            myCollection: {
+                collection : MyCollection
+            }
         };
 
         var backboneModel = Backbone.ModelExtensions.toBackboneModel({
@@ -62,9 +66,11 @@ buster.testCase("Backbone.ModelExtensions", {
             scheme : scheme
         });
 
-        var expected = new MyCollection();
+        var expected = new Backbone.Model({
+            myCollection : new MyCollection()
+        }).attributes;
 
-        buster.assert.equals(expected, backboneModel);
+        buster.assert.equals(expected, backboneModel.attributes);
     },
 
     "should create deep model": function () {
@@ -115,16 +121,18 @@ buster.testCase("Backbone.ModelExtensions", {
                     })
                 }),
                 new Backbone.Model({
-                    street: 'street 1',
+                    street: 'street 2',
                     phone: new Backbone.Model({
                         type: 'mobile',
-                        number: '1'
+                        number: '2'
                     })
                 })
             ])
-        });
+        }).attributes;
 
-        buster.assert.equals(expected, backboneModel);
+        buster.assert.equals(expected.name, backboneModel.attributes.name);
+        buster.assert.equals(expected.addresses.pop().attributes.street, backboneModel.attributes.addresses.pop().attributes.street);
+        buster.assert.equals(expected.addresses.pop().attributes.phone.attributes, backboneModel.attributes.addresses.pop().attributes.phone.attributes);
     }
 });
 

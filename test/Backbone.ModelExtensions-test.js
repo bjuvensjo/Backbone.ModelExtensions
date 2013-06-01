@@ -3,7 +3,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 require('../src/Backbone.ModelExtensions.js');
 
-buster.testCase("Backbone.ModelExtensions", {
+buster.testCase("Backbone.ModelExtensions.toBackboneModel", {
     "should handle primitives": function () {
         'use strict';
         var object = {
@@ -133,62 +133,114 @@ buster.testCase("Backbone.ModelExtensions", {
         buster.assert.equals(expected.name, backboneModel.attributes.name);
         buster.assert.equals(expected.addresses.pop().attributes.street, backboneModel.attributes.addresses.pop().attributes.street);
         buster.assert.equals(expected.addresses.pop().attributes.phone.attributes, backboneModel.attributes.addresses.pop().attributes.phone.attributes);
+    },
+
+    "should create collection with specific model": function () {
+        'use strict';
+        var object = {
+            myCollection : [
+                {
+                    name : 'Name'
+                }
+            ]
+        };
+
+        var MyModel = Backbone.Model.extend({
+            initialize : function () {
+                this.set('specific', 'specific');
+            }
+        });
+        var MyCollection = Backbone.Collection.extend({});
+
+        var scheme = {
+            myCollection : {
+                collection : MyCollection,
+                model : {
+                    model : MyModel
+                }
+            }
+        };
+
+        var backboneModel = Backbone.ModelExtensions.toBackboneModel({
+            object : object,
+            scheme : scheme
+        });
+
+        var expected = new Backbone.Model({
+            myCollection: new MyCollection([
+                new MyModel({
+                    name : 'Name'
+                })
+            ])
+        }).attributes;
+
+        buster.assert.equals(expected.myCollection.pop().attributes, backboneModel.attributes.myCollection.pop().attributes);
+    },
+
+    "events should not bubble" : function (done) {
+        'use strict';
+        var object = {
+            child : {}
+        };
+
+        var scheme = {};
+
+        var backboneModel = Backbone.ModelExtensions.toBackboneModel({
+            object : object,
+            scheme : scheme
+        });
+
+        var bubbled = false;
+        backboneModel.on('all', function () {
+            bubbled = true;
+        });
+        backboneModel.attributes.child.set('change', 'change');
+        setTimeout(done(function () {
+            buster.assert.equals(false, bubbled);
+        }), 200);
+    },
+
+    "events should bubble" : function (done) {
+        'use strict';
+        var object = {
+            child : {}
+        };
+
+        var scheme = {};
+
+        var backboneModel = Backbone.ModelExtensions.toBackboneModel({
+            object : object,
+            scheme : scheme,
+            bubbleEvents : true
+        });
+
+        var bubbled = false;
+        backboneModel.on('all', function () {
+            bubbled = true;
+        });
+        backboneModel.attributes.child.set('change', 'change');
+        setTimeout(done(function () {
+            buster.assert.equals(true, bubbled);
+        }), 200);
     }
 });
 
-
-
-
 /*
- // Test
- (function () {
+buster.testCase("Backbone.ModelExtensions.toBackboneCollection", {
+    "should handle primitives": function () {
+        'use strict';
+        var object = ['string', 1, null, undefined, NaN, Infinity];
 
- // An object
- var myObject = {
- name: 'Name',
- addresses: [
- {
- street: 'street 1',
- phone: {
- type: 'mobile',
- number: '1'
- }
- },
- {
- street: 'street 2',
- phone: {
- type: 'mobile',
- number: '2'
- }
- }
- ]
- };
+        var scheme = {};
 
- // Optionally, specify models and collections to use
- var myObjectScheme = {
- model: Backbone.Model.extend({}),
- addresses: {
- //collection: Backbone.Collection.extend({}),
- //model: Backbone.Model.extend({})
- }
- };
+        var backboneCollection = Backbone.ModelExtensions.toBackboneCollection({
+            object : object,
+            scheme : scheme
+        });
 
- // Specifies if events should "bubble" from child models and collections
- var bubbleEvents = true;
+        var expected = new Backbone.Collection(object);
 
- var myBackboneModelObject = Backbone.ModelExtensions.toBackboneModel({
- object: myObject,
- scheme: myObjectScheme,
- bubbleEvents: bubbleEvents
- });
-
- myBackboneModelObject.on('all', function (eventName) {
- console.dir(arguments);
- });
-
- myBackboneModelObject.get('addresses').at(0).set('street', 'new street');
-
- console.log(JSON.stringify(myBackboneModelObject));
-
- }());
- */
+        buster.assert.equals(expected.pop(), backboneCollection.pop());
+    }
+});
+*/

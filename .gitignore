@@ -2,3 +2,5 @@
 .tern*
 *slask*
 node_modules
+.idea
+*.iml

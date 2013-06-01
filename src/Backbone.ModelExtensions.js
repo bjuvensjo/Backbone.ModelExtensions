@@ -16,6 +16,34 @@ if (typeof module !== 'undefined' && module.exports) {
 
     var ModelExtensions = Backbone.ModelExtensions = Backbone.ModelExtensions || {};
 
+    var createModel = function (scheme) {
+        if (scheme.model) {
+            return new scheme.model();
+        }
+        return new Backbone.Model();
+    };
+
+    var createCollection = function (scheme) {
+        var collection;
+        if (scheme.collection) {
+            collection = new scheme.collection();
+        } else {
+            collection = new Backbone.Collection();
+        }
+        if (scheme.model) {
+            collection.model = scheme.model.model;
+        }
+        return collection;
+    };
+
+    var addEventProxy = function (parent, child, options) {
+        if (options.bubbleEvents) {
+            child.on("all", function(eventName) {
+                parent.trigger.apply(parent, arguments);
+            });
+        }
+    };
+
     /**
      * Creates nested Backbone models and collections from object.
      *
@@ -63,28 +91,6 @@ if (typeof module !== 'undefined' && module.exports) {
      */
     ModelExtensions.toBackboneModel = function(options) {
 
-        var createModel = function (scheme) {
-            if (scheme.model) {
-                return new scheme.model();
-            }
-            return new Backbone.Model();
-        };
-
-        var createCollection = function (scheme) {
-            if (scheme.collection) {
-                return new scheme.collection();
-            }
-            return new Backbone.Collection();
-        };
-
-        var addEventProxy = function (parent, child) {
-            if (options.bubbleEvents) {
-                child.on("all", function(eventName) {
-                    parent.trigger.apply(parent, arguments);
-                });            
-            }
-        };
-
         return _.reduce(options.object, function(model, value, key) {
             var child;
             var scheme = {};
@@ -98,16 +104,16 @@ if (typeof module !== 'undefined' && module.exports) {
                 _.each(value, function (element) {
                     child.add(ModelExtensions.toBackboneModel({
                         object: element,
-                        scheme: scheme
+                        scheme: scheme.model || scheme
                     }));
                 }, model);
-                addEventProxy(model, child);
+                addEventProxy(model, child, options);
                 model.set(key, child);
             } else if (_.isObject(value)) {
                 child = createModel(scheme);
-                addEventProxy(model, child);
+                addEventProxy(model, child, options);
                 model.set(key, ModelExtensions.toBackboneModel({
-                    object: value, 
+                    object: value,
                     target: child,
                     scheme: scheme
                 }));
@@ -119,5 +125,4 @@ if (typeof module !== 'undefined' && module.exports) {
         }, options.target || createModel(options.scheme));
 
     };
-
 }(Backbone, _));

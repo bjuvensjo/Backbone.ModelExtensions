@@ -37,8 +37,11 @@ For instance, it can be useful when you're using model-view-binding.
     var myObjectScheme = {
         model: Backbone.Model.extend({}),
         addresses: {
-            //collection: Backbone.Collection.extend({}),
-            //model: Backbone.Model.extend({})
+            collection: Backbone.Collection.extend({}),
+            model: {
+                model: Backbone.Model.extend({}),
+                type: Backbone.Model.extend({})
+            }
         }
     };
 
@@ -59,3 +62,5 @@ For instance, it can be useful when you're using model-view-binding.
 
     console.log(JSON.stringify(myBackboneModelObject));
 ```
+### Backbone.ModelExtensions.toBackboneCollection
+Analog with ```js toBackboneModel``` but takes an ```js array``` option instead of ```js object```, and returns a Backbone.Collection

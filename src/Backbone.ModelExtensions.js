@@ -3,45 +3,46 @@ if (typeof module !== 'undefined' && module.exports) {
     var Backbone = require('backbone');
 }
 
-'use strict';
-
 /**
  * Backbone.ModelExtensions
  *
  * Adds extensions into Backbone's base classes
  *
- * @author Magnus Bjuvensjö
+ * @author Magnus Bjuvensjö, Anders Bälter
  */
-(function(Backbone, _) {
+(function (Backbone, _) {
+    'use strict';
 
     var ModelExtensions = Backbone.ModelExtensions = Backbone.ModelExtensions || {};
 
-    var createModel = function (scheme) {
-        if (scheme.model) {
-            return new scheme.model();
-        }
-        return new Backbone.Model();
-    };
-
-    var createCollection = function (scheme) {
-        var collection;
-        if (scheme.collection) {
-            collection = new scheme.collection();
-        } else {
-            collection = new Backbone.Collection();
-        }
-        if (scheme.model) {
-            collection.model = scheme.model.model;
-        }
-        return collection;
-    };
-
     var addEventProxy = function (parent, child, options) {
         if (options.bubbleEvents) {
-            child.on("all", function(eventName) {
+            child.on("all", function (eventName) {
                 parent.trigger.apply(parent, arguments);
             });
         }
+    };
+
+    var handleObject = function (value, scheme, parent, options) {
+        var result;
+        if (_.isArray(value)) {
+            result = ModelExtensions.toBackboneCollection({
+                array: value,
+                scheme: scheme,
+                bubbleEvents: options.bubbleEvents
+            });
+            addEventProxy(parent, result, options);
+        } else if (_.isObject(value)) {
+            result = ModelExtensions.toBackboneModel({
+                object: value,
+                scheme: scheme,
+                bubbleEvents: options.bubbleEvents
+            });
+            addEventProxy(parent, result, options);
+        } else {
+            result = value;
+        }
+        return result;
     };
 
     /**
@@ -89,40 +90,58 @@ if (typeof module !== 'undefined' && module.exports) {
      *
      * myBackboneModelObject.get('addresses').at(0).set('street', 'new street');
      */
-    ModelExtensions.toBackboneModel = function(options) {
+    ModelExtensions.toBackboneModel = function (options) {
+        var createModel = function (scheme) {
+            if (scheme && scheme.model) {
+                return new scheme.model();
+            }
+            return new Backbone.Model();
+        };
 
-        return _.reduce(options.object, function(model, value, key) {
-            var child;
+        return _.reduce(options.object, function (model, value, key) {
+            var result;
             var scheme = {};
 
             if (options.scheme && options.scheme[key]) {
                 scheme = options.scheme[key];
             }
 
-            if (_.isArray(value)) {
-                child = createCollection(scheme);
-                _.each(value, function (element) {
-                    child.add(ModelExtensions.toBackboneModel({
-                        object: element,
-                        scheme: scheme.model || scheme
-                    }));
-                }, model);
-                addEventProxy(model, child, options);
-                model.set(key, child);
-            } else if (_.isObject(value)) {
-                child = createModel(scheme);
-                addEventProxy(model, child, options);
-                model.set(key, ModelExtensions.toBackboneModel({
-                    object: value,
-                    target: child,
-                    scheme: scheme
-                }));
-            } else {
-                model.set(key, value);
-            }
+            result = handleObject(value, scheme, model, options);
+
+            model.set(key, result);
 
             return model;
-        }, options.target || createModel(options.scheme));
+        }, createModel(options.scheme));
+
+    };
+
+    ModelExtensions.toBackboneCollection = function (options) {
+        var createCollection = function (scheme) {
+            var collection;
+            if (scheme && scheme.collection) {
+                collection = new scheme.collection();
+            } else {
+                collection = new Backbone.Collection();
+            }
+            if (scheme && scheme.model) {
+                collection.model = scheme.model.model;
+            }
+            return collection;
+        };
+
+        return _.reduce(options.array, function (collection, value) {
+            var result;
+            var scheme = {};
+
+            if (options.scheme && options.scheme.collection) {
+                scheme = options.scheme.model || options.scheme;
+            }
+
+            result = handleObject(value, scheme, collection, options);
+            collection.add(result);
+
+            return collection;
+        }, createCollection(options.scheme));
 
     };
 }(Backbone, _));

@@ -222,25 +222,88 @@ buster.testCase("Backbone.ModelExtensions.toBackboneModel", {
         setTimeout(done(function () {
             buster.assert.equals(true, bubbled);
         }), 200);
+    },
+
+    "should be ok without scheme": function () {
+        'use strict';
+        try {
+            Backbone.ModelExtensions.toBackboneModel({object: {}});
+            buster.assert(true);
+        } catch (error) {
+            buster.assert(false);
+        }
     }
 });
 
-/*
+
 buster.testCase("Backbone.ModelExtensions.toBackboneCollection", {
-    "should handle primitives": function () {
+    "should handle simple array": function () {
         'use strict';
-        var object = ['string', 1, null, undefined, NaN, Infinity];
+        var array = [{}, {}];
 
         var scheme = {};
 
         var backboneCollection = Backbone.ModelExtensions.toBackboneCollection({
-            object : object,
+            array : array,
+            scheme : scheme
+        });
+        var item1 = backboneCollection.pop();
+        item1.cid = 0;
+        var item2 = backboneCollection.pop();
+        item2.cid = 0;
+
+        var expected = new Backbone.Collection(array);
+        var expected1 = expected.pop();
+        expected1.cid = 0;
+        var expected2 = expected.pop();
+        expected2.cid = 0;
+
+        buster.assert.equals(expected1, item1);
+        buster.assert.equals(expected2, item2);
+    },
+
+    "should handle array of objects": function () {
+        'use strict';
+        var array = [{id: 1, key: []}];
+
+        var scheme = {};
+
+        var backboneCollection = Backbone.ModelExtensions.toBackboneCollection({
+            array : array,
             scheme : scheme
         });
 
-        var expected = new Backbone.Collection(object);
+        buster.assert(backboneCollection.get(1).get('key') instanceof Backbone.Collection);
+    },
 
-        buster.assert.equals(expected.pop(), backboneCollection.pop());
+    "should handle array specific models": function () {
+        'use strict';
+        var array = [{key : {}}, {key : {}}];
+
+        var MyModel = Backbone.Model.extend({
+            initialize : function () {
+                this.set('key', 'value');
+            }
+        });
+        var MyCollection = Backbone.Collection.extend({});
+
+        var scheme = {
+            collection : MyCollection,
+            model : {
+                model : MyModel,
+                key : {
+                    model : MyModel
+                }
+            }
+        };
+
+        var backboneCollection = Backbone.ModelExtensions.toBackboneCollection({
+            array : array,
+            scheme : scheme
+        });
+
+        buster.assert(backboneCollection instanceof MyCollection);
+        buster.assert(backboneCollection.at(0) instanceof MyModel);
+        buster.assert(backboneCollection.at(0).get('key') instanceof MyModel);
     }
 });
-*/

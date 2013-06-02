@@ -63,4 +63,4 @@ For instance, it can be useful when you're using model-view-binding.
     console.log(JSON.stringify(myBackboneModelObject));
 ```
 ### Backbone.ModelExtensions.toBackboneCollection
-Analog with ```js toBackboneModel``` but takes an ```js array``` option instead of ```js object```, and returns a Backbone.Collection
+Analog with ```toBackboneModel``` but takes an ```array``` option instead of ```object```, and returns a Backbone.Collection

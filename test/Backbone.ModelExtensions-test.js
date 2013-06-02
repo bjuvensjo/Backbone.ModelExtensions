@@ -214,13 +214,13 @@ buster.testCase("Backbone.ModelExtensions.toBackboneModel", {
             bubbleEvents : true
         });
 
-        var bubbled = false;
-        backboneModel.on('all', function () {
-            bubbled = true;
+        var bubbled = 0;
+        backboneModel.on('all', function (eventName) {
+            bubbled++;
         });
         backboneModel.attributes.child.set('change', 'change');
         setTimeout(done(function () {
-            buster.assert.equals(true, bubbled);
+            buster.assert.equals(2, bubbled); // change and change:change
         }), 200);
     },
 
@@ -305,5 +305,43 @@ buster.testCase("Backbone.ModelExtensions.toBackboneCollection", {
         buster.assert(backboneCollection instanceof MyCollection);
         buster.assert(backboneCollection.at(0) instanceof MyModel);
         buster.assert(backboneCollection.at(0).get('key') instanceof MyModel);
+    },
+
+    "should bubble events": function (done) {
+        'use strict';
+        var array = [{key : {}}, {array : []}];
+
+        var MyModel = Backbone.Model.extend({});
+        var MyCollection = Backbone.Collection.extend({});
+
+        var scheme = {
+            collection : MyCollection,
+            model : {
+                model : MyModel,
+                key : {
+                    model : MyModel
+                },
+                array : {
+                    collection : MyCollection
+                }
+            }
+        };
+
+        var backboneCollection = Backbone.ModelExtensions.toBackboneCollection({
+            array : array,
+            scheme : scheme,
+            bubbleEvents : true
+        });
+
+        var bubbled = 0;
+        backboneCollection.on('all', function (eventName) {
+            console.log(eventName);
+            bubbled++;
+        });
+        backboneCollection.at(0).get('key').set('change', 'change');
+        backboneCollection.at(1).get('array').add('change');
+        setTimeout(done(function () {
+            buster.assert.equals(5, bubbled); // 2xchange, 2xchange:change and add
+        }), 200);
     }
 });

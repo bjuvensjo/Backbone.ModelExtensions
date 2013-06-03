@@ -335,7 +335,6 @@ buster.testCase("Backbone.ModelExtensions.toBackboneCollection", {
 
         var bubbled = 0;
         backboneCollection.on('all', function (eventName) {
-            console.log(eventName);
             bubbled++;
         });
         backboneCollection.at(0).get('key').set('change', 'change');

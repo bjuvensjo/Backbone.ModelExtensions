@@ -139,7 +139,7 @@ if (typeof module !== 'undefined' && module.exports) {
             var result;
             var scheme = {};
 
-            if (options.scheme && options.scheme.collection) {
+            if (options.scheme && (options.scheme.collection || options.scheme.model)) {
                 scheme = options.scheme.model || options.scheme;
             }
 

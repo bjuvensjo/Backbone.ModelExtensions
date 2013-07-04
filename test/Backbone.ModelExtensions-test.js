@@ -307,6 +307,26 @@ buster.testCase("Backbone.ModelExtensions.toBackboneCollection", {
         buster.assert(backboneCollection.at(0).get('key') instanceof MyModel);
     },
 
+    "should handle specific models in generic collection": function () {
+        'use strict';
+        var array = [{}];
+
+        var MyModel = Backbone.Model.extend({});
+
+        var scheme = {
+            model : {
+                model : MyModel
+            }
+        };
+
+        var backboneCollection = Backbone.ModelExtensions.toBackboneCollection({
+            array : array,
+            scheme : scheme
+        });
+
+        buster.assert(backboneCollection.at(0) instanceof MyModel);
+    },
+
     "should bubble events": function (done) {
         'use strict';
         var array = [{key : {}}, {array : []}];

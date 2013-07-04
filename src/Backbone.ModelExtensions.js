@@ -91,6 +91,9 @@ if (typeof module !== 'undefined' && module.exports) {
      * myBackboneModelObject.get('addresses').at(0).set('street', 'new street');
      */
     ModelExtensions.toBackboneModel = function (options) {
+        if (!options.object) {
+            throw 'Illegal arguments, options.object must be set';
+        }
         var createModel = function (scheme) {
             if (scheme && scheme.model) {
                 return new scheme.model();
@@ -116,6 +119,9 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 
     ModelExtensions.toBackboneCollection = function (options) {
+        if (!options.array) {
+            throw 'Illegal arguments, options.array must be set';
+        }
         var createCollection = function (scheme) {
             var collection;
             if (scheme && scheme.collection) {
@@ -133,7 +139,7 @@ if (typeof module !== 'undefined' && module.exports) {
             var result;
             var scheme = {};
 
-            if (options.scheme && options.scheme.collection) {
+            if (options.scheme && (options.scheme.collection || options.scheme.model)) {
                 scheme = options.scheme.model || options.scheme;
             }
 
@@ -142,6 +148,24 @@ if (typeof module !== 'undefined' && module.exports) {
 
             return collection;
         }, createCollection(options.scheme));
+    };
 
+    ModelExtensions.toJSON = function (object, options) {
+        var json;
+        if (object instanceof Backbone.Model) {
+            json = Backbone.Model.prototype.toJSON.call(object, options);
+        } else {
+            json = Backbone.Collection.prototype.toJSON.call(object, options);
+        }
+        _.each(json, function (value, key, list) {
+            if (value instanceof Backbone.Model || value instanceof Backbone.Collection) {
+                json[key] = ModelExtensions.toJSON(value, options);
+            }
+        });
+        return json;
+    };
+
+    ModelExtensions.toJSONMixin = function(options) {
+        return ModelExtensions.toJSON(this, options);
     };
 }(Backbone, _));

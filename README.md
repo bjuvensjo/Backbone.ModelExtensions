@@ -64,3 +64,19 @@ For instance, it can be useful when you're using model-view-binding.
 ```
 ### Backbone.ModelExtensions.toBackboneCollection
 Analog with ```toBackboneModel``` but takes an ```array``` option instead of ```object```, and returns a Backbone.Collection
+
+### Backbone.ModelExtensions.toJSON
+Converts a set of nested Backbone.Models and Backbone.Collections to JSON.
+```js
+Backbone.ModelExtensions.toJSON(model);
+```
+Can also be used as a mixin
+```js
+var MyModel = Backbone.Model.extend({
+    toJSON : Backbone.ModelExtensions.toJSONMixin
+});
+
+var MyCollection = Backbone.Collection.extend({
+    toJSON : Backbone.ModelExtensions.toJSONMixin
+});
+```

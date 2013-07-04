@@ -148,6 +148,26 @@ if (typeof module !== 'undefined' && module.exports) {
 
             return collection;
         }, createCollection(options.scheme));
-
     };
+
+    ModelExtensions.toJSON = function (object, options) {
+        var json;
+        if (object instanceof Backbone.Model) {
+            json = Backbone.Model.prototype.toJSON.call(object, options);
+        } else {
+            json = Backbone.Collection.prototype.toJSON.call(object, options);
+        }
+        _.each(json, function (value, key, list) {
+            if (value instanceof Backbone.Model || value instanceof Backbone.Collection) {
+                json[key] = ModelExtensions.toJSON(value, options);
+            }
+        });
+        return json;
+    };
+
+    ModelExtensions.toJSONMixin = function(options) {
+        return ModelExtensions.toJSON(this, options);
+    }
+
+
 }(Backbone, _));

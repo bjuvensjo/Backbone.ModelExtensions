@@ -167,7 +167,5 @@ if (typeof module !== 'undefined' && module.exports) {
 
     ModelExtensions.toJSONMixin = function(options) {
         return ModelExtensions.toJSON(this, options);
-    }
-
-
+    };
 }(Backbone, _));

@@ -8,7 +8,7 @@ if (typeof module !== 'undefined' && module.exports) {
  *
  * Adds extensions into Backbone's base classes
  *
- * @author Magnus Bjuvensjö, Anders Bälter
+ * @author Magnus Bjuvensjö & Anders Bälter
  */
 (function (Backbone, _) {
     'use strict';

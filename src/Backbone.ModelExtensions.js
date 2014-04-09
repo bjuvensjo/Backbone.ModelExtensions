@@ -1,16 +1,19 @@
-if (typeof module !== 'undefined' && module.exports) {
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-}
-
 /**
  * Backbone.ModelExtensions
  *
  * Adds extensions into Backbone's base classes
  *
- * @author Magnus Bjuvensjö & Anders Bälter
+ * @author Magnus Bjuvensjö, Anders Bälter
  */
-(function (Backbone, _) {
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['backbone', 'underscore'], factory);
+    } else {
+        // Browser globals
+        factory(Backbone, _);
+    }
+}(function (Backbone, _) {
     'use strict';
 
     var ModelExtensions = Backbone.ModelExtensions = Backbone.ModelExtensions || {};
@@ -168,4 +171,4 @@ if (typeof module !== 'undefined' && module.exports) {
     ModelExtensions.toJSONMixin = function(options) {
         return ModelExtensions.toJSON(this, options);
     };
-}(Backbone, _));
+}));
